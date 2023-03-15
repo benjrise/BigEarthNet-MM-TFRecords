@@ -54,7 +54,7 @@ def parse_args():
         dest="cores",
         type=int,
         default=1,
-        help="number of cores to use, default is single process"
+        help="number of cores to use, default is single process",
     )
 
     parser.add_argument(
@@ -75,12 +75,13 @@ def parse_args():
     parser.add_argument(
         "-b",
         "--bad_patches",
-        dest = "bad_patches",
+        dest="bad_patches",
         help="Include bad patches in the output",
     )
 
     args = parser.parse_args()
     return args
+
 
 LABELS_19 = [
     "Urban fabric",
@@ -123,31 +124,31 @@ LABELS = [
     'Sparsely vegetated areas', 'Sport and leisure facilities',
     'Transitional woodland/shrub', 'Vineyards', 'Water bodies', 'Water courses'
 ]
-#fmt: on
+# fmt: on
 
 GROUP_LABELS = {
-    'Continuous urban fabric': 'Urban fabric',
-    'Discontinuous urban fabric': 'Urban fabric',
-    'Non-irrigated arable land': 'Arable land',
-    'Permanently irrigated land': 'Arable land',
-    'Rice fields': 'Arable land',
-    'Vineyards': 'Permanent crops',
-    'Fruit trees and berry plantations': 'Permanent crops',
-    'Olive groves': 'Permanent crops',
-    'Annual crops associated with permanent crops': 'Permanent crops',
-    'Natural grassland': 'Natural grassland and sparsely vegetated areas',
-    'Sparsely vegetated areas': 'Natural grassland and sparsely vegetated areas',
-    'Moors and heathland': 'Moors, heathland and sclerophyllous vegetation',
-    'Sclerophyllous vegetation': 'Moors, heathland and sclerophyllous vegetation',
-    'Inland marshes': 'Inland wetlands',
-    'Peatbogs': 'Inland wetlands',
-    'Salt marshes': 'Coastal wetlands',
-    'Salines': 'Coastal wetlands',
-    'Water bodies': 'Inland waters',
-    'Water courses': 'Inland waters',
-    'Coastal lagoons': 'Marine waters',
-    'Estuaries': 'Marine waters',
-    'Sea and ocean': 'Marine waters'
+    "Continuous urban fabric": "Urban fabric",
+    "Discontinuous urban fabric": "Urban fabric",
+    "Non-irrigated arable land": "Arable land",
+    "Permanently irrigated land": "Arable land",
+    "Rice fields": "Arable land",
+    "Vineyards": "Permanent crops",
+    "Fruit trees and berry plantations": "Permanent crops",
+    "Olive groves": "Permanent crops",
+    "Annual crops associated with permanent crops": "Permanent crops",
+    "Natural grassland": "Natural grassland and sparsely vegetated areas",
+    "Sparsely vegetated areas": "Natural grassland and sparsely vegetated areas",
+    "Moors and heathland": "Moors, heathland and sclerophyllous vegetation",
+    "Sclerophyllous vegetation": "Moors, heathland and sclerophyllous vegetation",
+    "Inland marshes": "Inland wetlands",
+    "Peatbogs": "Inland wetlands",
+    "Salt marshes": "Coastal wetlands",
+    "Salines": "Coastal wetlands",
+    "Water bodies": "Inland waters",
+    "Water courses": "Inland waters",
+    "Coastal lagoons": "Marine waters",
+    "Estuaries": "Marine waters",
+    "Sea and ocean": "Marine waters",
 }
 
 # radar and spectral band names to read related GeoTIFF files
@@ -166,7 +167,8 @@ BAND_NAMES_S2 = [
     "B11",
     "B12",
 ]
-RGB_BANDS = ['B04', 'B03', 'B02']
+RGB_BANDS = ["B04", "B03", "B02"]
+
 
 def label_mapping_19(label_list):
     # From https://bigearth.eu/BigEarthNetListofClasses.pdf
@@ -178,12 +180,12 @@ def label_mapping_19(label_list):
             continue
         if label not in GROUP_LABELS:
             continue
-        label_19 = GROUP_LABELS[label] 
+        label_19 = GROUP_LABELS[label]
         if label_19 in out_labels_19:
             continue
         out_labels_19.append(GROUP_LABELS[label])
     return out_labels_19
-        
+
 
 def read_bands(patch_folder_path, patch_name, band_names):
     band_dict = {}
@@ -212,6 +214,7 @@ def read_bands(patch_folder_path, patch_name, band_names):
 
     return band_dict
 
+
 def multi_hot_encode(patch_labels, all_labels):
     multi_hot = np.zeros(len(all_labels), dtype=int)
     for label in patch_labels:
@@ -219,9 +222,9 @@ def multi_hot_encode(patch_labels, all_labels):
         multi_hot[label_index] = 1
     return multi_hot
 
-        
+
 if __name__ == "__main__":
-    args = parse_args()    
+    args = parse_args()
     os.makedirs(args.output_folder, exist_ok=True)
 
     # Checks the existence of patch folders and populate the list of patch folder paths
@@ -293,7 +296,7 @@ if __name__ == "__main__":
             seasonal_snow = f.readlines()
             seasonal_snow = [x.strip() for x in seasonal_snow]
             bad_patches.extend(seasonal_snow)
-    
+
     with open("bigearthnet-train.txt", "r") as f:
         train = f.readlines()
         train = [x.strip() for x in train]
@@ -301,11 +304,11 @@ if __name__ == "__main__":
     with open("bigearthnet-val.txt", "r") as f:
         val = f.readlines()
         val = [x.strip() for x in val]
-    
+
     with open("bigearthnet-test.txt", "r") as f:
         test = f.readlines()
         test = [x.strip() for x in test]
-    
+
     os.makedirs(os.path.join(args.output_folder, "train"), exist_ok=True)
     os.makedirs(os.path.join(args.output_folder, "val"), exist_ok=True)
     os.makedirs(os.path.join(args.output_folder, "test"), exist_ok=True)
@@ -324,7 +327,10 @@ if __name__ == "__main__":
         # get corresponding s2 patch
         patch_name_s2 = labels_metadata_s1["corresponding_s2_patch"]
         patch_folder_path_s2 = os.path.join(args.root_folder_s2, patch_name_s2)
-        if os.path.basename(patch_folder_path_s2) in bad_patches and args.bad_patches is not None:
+        if (
+            os.path.basename(patch_folder_path_s2) in bad_patches
+            and args.bad_patches is not None
+        ):
             print("INFO: skipping patch", patch_name_s2)
             return
 
@@ -343,17 +349,21 @@ if __name__ == "__main__":
             features_dict[feature_name] = tf.train.Feature(
                 int64_list=tf.train.Int64List(value=value.reshape(-1))
             )
-        
-        labels =  labels_metadata_s1["labels"]
+
+        labels = labels_metadata_s1["labels"]
         labels_19 = label_mapping_19(labels_metadata_s1["labels"])
         multi_hot_43 = multi_hot_encode(labels, LABELS)
         multi_hot_19 = multi_hot_encode(labels_19, LABELS_19)
 
         features_dict["BigEarthNet-43_labels"] = tf.train.Feature(
-            bytes_list=tf.train.BytesList(value=[label.encode("utf-8") for label in labels])
+            bytes_list=tf.train.BytesList(
+                value=[label.encode("utf-8") for label in labels]
+            )
         )
         features_dict["BigEarthNet-19_labels"] = tf.train.Feature(
-            bytes_list=tf.train.BytesList(value=[label.encode("utf-8") for label in labels_19])
+            bytes_list=tf.train.BytesList(
+                value=[label.encode("utf-8") for label in labels_19]
+            )
         )
         features_dict["BigEarthNet-43_labels_multi_hot"] = tf.train.Feature(
             int64_list=tf.train.Int64List(value=multi_hot_43)
@@ -361,40 +371,32 @@ if __name__ == "__main__":
         features_dict["BigEarthNet-19_labels_multi_hot"] = tf.train.Feature(
             int64_list=tf.train.Int64List(value=multi_hot_19)
         )
-        features_dict["patch_name_s1"] = tf.train.Feature( 
+        features_dict["patch_name_s1"] = tf.train.Feature(
             bytes_list=tf.train.BytesList(value=[patch_name_s1.encode("utf-8")])
         )
-        features_dict["patch_name_s2"] = tf.train.Feature( 
+        features_dict["patch_name_s2"] = tf.train.Feature(
             bytes_list=tf.train.BytesList(value=[patch_name_s2.encode("utf-8")])
         )
 
-        out_example = tf.train.Example(features=tf.train.Features(feature=features_dict))
+        out_example = tf.train.Example(
+            features=tf.train.Features(feature=features_dict)
+        )
         out_name = patch_name_s2 + ".tfrecord"
-        if patch_name_s2 in train: 
-            out_path = os.path.join(args.output_folder, "train", out_name) 
-        elif patch_name_s2 in val: 
-            out_path = os.path.join(args.output_folder, "val", out_name) 
-        elif patch_name_s2 in test: 
-            out_path = os.path.join(args.output_folder, "test", out_name) 
+        if patch_name_s2 in train:
+            out_path = os.path.join(args.output_folder, "train", out_name)
+        elif patch_name_s2 in val:
+            out_path = os.path.join(args.output_folder, "val", out_name)
+        elif patch_name_s2 in test:
+            out_path = os.path.join(args.output_folder, "test", out_name)
         else:
-            raise("Unexpected patch name {}".format(patch_name_s2))
-        
+            raise ("Unexpected patch name {}".format(patch_name_s2))
+
         with tf.io.TFRecordWriter(out_path) as writer:
             writer.write(out_example.SerializeToString())
 
     pool = Pool(args.cores)
-    for _ in tqdm.tqdm(pool.imap_unordered(create_record, folder_path_list), total=len(folder_path_list)):
+    for _ in tqdm.tqdm(
+        pool.imap_unordered(create_record, folder_path_list),
+        total=len(folder_path_list),
+    ):
         ...
-        
-
-
-
-
-    # print(multi_hot_19)
-        # print(features_dict["19_labels_multi_hot"])
-
-
-
-
-        
-
